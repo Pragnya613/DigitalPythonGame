@@ -30,7 +30,7 @@
 11111111111111111111111111111111111111111111111111
 
 # 0:Empty Space 1:Walls 2:Helpful NPC 3:Enemy 4:Boss 1 5:Boss 2 
-# R:Rocks  P:Player  E:Endpoint  K:Key  W:Water  D:Sand Dollars  T:Treasure  B:Bone  L:Land C:Coral S:Seaweed
+# S:Rocks  P:Player   K:Key  W:Water  D:Sand Dollars  X:Treasure  N:Bone  E:Land C:Coral 
 # G:Gas Tank  Y:Wet Suit  F:Fins 
 # H:Sub Hull  O:Propeller  A:Radar
 # Q:Giant Squid   I:Shark
