@@ -1,5 +1,5 @@
 # 0:Empty Space 1:Walls 2:Helpful NPC 3:Enemy 4:Boss 1 5:Boss 2 
-# S:Rocks  P:Player  K:Key  W:Water  D:Sand Dollars  X:Treasure  N:Bone  E:Land C:Coral 
+# S:Rocks  P:Player  J:Key  W:Water  D:Sand Dollars  X:Treasure  N:Bone  E:Land C:Coral K:Kelp
 # G:Gas Tank  Y:Wet Suit  F:Fins 
 # H:Sub Hull  O:Propeller  A:Radar
 # Q:Giant Squid   I:Shark
