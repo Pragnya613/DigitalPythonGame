@@ -149,6 +149,17 @@ class Land(pygame.sprite.Sprite):
         self.image.fill(SAND)
         self.rect = self.image.get_rect(topleft = (x,y))
 
+#=======================================================================
+#                            LAVA CLASS
+#=======================================================================
+
+class Lava(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
+        self.image.fill(GOLD)
+        self.rect = self.image.get_rect(topleft = (x,y))
+
 
 
 
@@ -218,8 +229,8 @@ class Kelp(pygame.sprite.Sprite):
 class HelpfulNPC(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
-        self.image.fill(BLUE)
+        self.image = pygame.image.load("clownfish.png")
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))  # Resize to fit tile
         self.rect = self.image.get_rect(topleft = (x,y))
         
 #=======================================================================
@@ -325,8 +336,8 @@ class Radar(pygame.sprite.Sprite):
 class Shark(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
-        self.image.fill(BLUE)
+        self.image = pygame.image.load("shark.png")
+        self.image = pygame.transform.scale(self.image, (TILE_SIZE, TILE_SIZE))  # Resize to fit tile
         self.rect = self.image.get_rect(topleft = (x,y))
         
 #=======================================================================
@@ -393,16 +404,44 @@ class EndPoint(pygame.sprite.Sprite):
 def load_maze(filename):
 	all_sprites = pygame.sprite.Group()
 	wall_sprites = pygame.sprite.Group()
+	rocks_sprites = pygame.sprite.Group()
+	left_wall_sprites = pygame.sprite.Group()
+	right_wall_sprites = pygame.sprite.Group()
+	top_wall_sprites = pygame.sprite.Group()
+	bottom_wall_sprites = pygame.sprite.Group()
+	land_sprites = pygame.sprite.Group()
+	lava_sprites = pygame.sprite.Group()
+	
+	sand_dollar_sprites = pygame.sprite.Group()
+	bone_sprites = pygame.sprite.Group()
+	coral_sprites = pygame.sprite.Group()
+	kelp_sprites = pygame.sprite.Group()
+	
+	helpful_npc_sprites = pygame.sprite.Group()
+	treasure_sprites = pygame.sprite.Group()
+	key_sprites = pygame.sprite.Group()
+	gas_tank_sprites = pygame.sprite.Group()
+	wetsuit_sprites = pygame.sprite.Group()
+	fins_sprites = pygame.sprite.Group()
+	sub_hull_sprites = pygame.sprite.Group()
+	propeller_sprites = pygame.sprite.Group()
+	radar_sprites = pygame.sprite.Group()
+	
+	shark_sprites = pygame.sprite.Group()
+	squid_sprites = pygame.sprite.Group()
+	boss_one_sprites = pygame.sprite.Group()
+	boss_two_sprites = pygame.sprite.Group()
 
 	player = None
-	start_point = None
 	wall = None
+	start_point = None
 	rocks = None
 	left_wall = None
 	right_wall = None
 	top_wall = None
 	bottom_wall = None
 	land = None
+	lava = None
 
 	sand_dollar = None
 	bone = None
@@ -414,7 +453,7 @@ def load_maze(filename):
 	key = None
 	gas_tank = None
 	wetsuit = None
-	fin = None
+	fins = None
 	sub_hull = None
 	propeller = None
 	radar = None
@@ -451,7 +490,7 @@ def load_maze(filename):
 				elif char == "L":
 					left_wall = LeftWall(x, y)
 					all_sprites.add(left_wall)
-					left_wall_sprites.addleft_wall)
+					left_wall_sprites.add(left_wall)
 				elif char == "R":
 					right_wall = RightWall(x, y)
 					all_sprites.add(right_wall)
@@ -468,6 +507,10 @@ def load_maze(filename):
 					land = Land(x, y)
 					all_sprites.add(land)
 					land_sprites.add(land)
+				eliv char == "M":
+					lava = Lava(x, y)
+					all_sprites.add(lava)
+					lava_sprites.add(lava)
 					
 # These are the collectable/decorative objects in the game
 				elif char == "D":
@@ -542,7 +585,6 @@ def load_maze(filename):
 					boss_two = BossTwo(x, y)
 					all_sprites.add(boss_two)
 					boss_two_sprites.add(boss_two)
-
 #Endpoint
 				elif char == "E":
 					end_point = EndPoint (x,y)
@@ -550,24 +592,25 @@ def load_maze(filename):
 
 
 
-	return all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, end_point
+	return all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, land, lava, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point
 
 def main():
 	clock = pygame.time.Clock()
-	keys = 0
+	sandDollars = 0
+	health = 50
+	key = 0
+	lives = 3
 	
-	all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, end_point = load_maze("LVL1.txt")
+	inventory = {}
+	
+	all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point = load_maze("LVL1.txt")
 	running = True
 	game_won = False
 
 	screen = pygame.display.set_mode((WIDTH, HEIGHT))
-	pygame.display.set_caption("Maze Game")
+	pygame.display.set_caption("Ocean Game")
 
 	while running:
-		# TODO 15: Handle events.
-		# Hint: pygame.event.get()
-		# Allow the player to close the window.
-		enemy_sprites.update(wall_sprites)
 		player.update(wall_sprites)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -577,46 +620,37 @@ def main():
 					player.rect.topleft = start_point.rect.topleft
 					game_won = False
 			if not game_won:
-				
-				if  pygame.sprite.collide_rect(player, end_point) and level == "1":
-					screen.blit
-					level = "2"
-					all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, end_point = load_maze(level + ".txt")
-					print("level 2")
-					player.speed = 3
-				elif keys == 2 and pygame.sprite.collide_rect(player, end_point) and level == "2":
-					screen.blit
-					level = "3"
-					print(level)
-					all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, end_point = load_maze(level + ".txt")
-					print("Level 3")
-		if pygame.sprite.spritecollide(player, enemy_sprites, False):
-			all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, end_point = load_maze(level + ".txt")
-			if level == "2":
-				keys = 0
-			elif level == "3":
-				keys = 2
-		if pygame.sprite.spritecollide(player, key_sprites, True):
-			keys += 1
-			key_sound.play()
-			print(keys)
-		if pygame.sprite.collide_rect(player, speed):
-			player.speed = 1
+				if pygame.sprite.collide_rect(player, sand_dollar_sprites):
+					sandDollars += 1
+				if pygame.sprite.collide_rect(player, rocks_sprites):
+					health -= 1
+					print(health)
+					if health < 1:
+						lives -= 1
+						print(lives)
+				if pygame.sprite.collide_rect(player, shark_sprites):
+					health -= 1
+					print(health)
+					if health < 1:
+						lives -= 1
+						print(lives)
+				if pygame.sprite.collide_rect(player, squid_sprites):
+					health -= 1
+					print(health)
+					if health < 1:
+						lives -= 1
+						print(lives)
+				if pygame.sprite.collide_rect(player, key_sprites):
+					key += 1
+			if health > 1 and pygame.sprite.collide_rect(player, treasure):
+				print("You Win!")
+				game_won = True
 				
 		screen.fill(WHITE)
 		all_sprites.draw(screen)
-		# TODO 19: If game_won is True, display "You Win!"
-		if (level == "3"):
-			if keys == 6 and pygame.sprite.collide_rect(player, end_point):
-				print("You Win!")
-				pygame.mixer.music.stop()
-				end_music.play()
-				game_won = True
-			
-				if __name__ == "__main__":
-					main()
+		
 		if game_won == True:
-			text = font.render("You Win!", True, GREEN)
+			text = font.render("Great Job on finding the treasure!", True, GOLD)
 			text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
 
 			# Dark background behind the message.
@@ -636,7 +670,7 @@ def main():
 			if restart == "R" or restart == "r":
 				level = "1"
 				keys = 0
-				all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, end_point = load_maze("maze" + level + ".txt")
+				all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point = load_maze("maze" + level + ".txt")
 				game_won = False
 
 		#screen.blit(restart_text, restart_rect)
