@@ -139,6 +139,17 @@ class BottomWall(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = (x,y))
 
 #=======================================================================
+#                          STORE WALL CLASS
+#=======================================================================
+
+class StoreWall(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
+        self.image.fill(BLACK)
+        self.rect = self.image.get_rect(topleft = (x,y))
+
+#=======================================================================
 #                            LAND CLASS
 #=======================================================================
 
@@ -374,7 +385,7 @@ class BossTwo(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = (x,y))
 
 #=======================================================================
-#                      START AND END CLASSES
+#                          START CLASSES
 #=======================================================================
 
 class StartPoint(pygame.sprite.Sprite):
@@ -386,17 +397,7 @@ class StartPoint(pygame.sprite.Sprite):
         )
         self.image.fill(GOLD)
         self.rect = self.image.get_rect(topleft=(x, y))
-
-class EndPoint(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-
-        self.image = pygame.Surface(
-            (TILE_SIZE, TILE_SIZE)
-        )
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect(topleft=(x, y))
-
+        
 #=======================================================================
 #                        LOADING THE GAME
 #=======================================================================
@@ -409,6 +410,7 @@ def load_maze(game):
 	right_wall_sprites = pygame.sprite.Group()
 	top_wall_sprites = pygame.sprite.Group()
 	bottom_wall_sprites = pygame.sprite.Group()
+	store_wall_sprites = pygame.sprite.Group()
 	land_sprites = pygame.sprite.Group()
 	lava_sprites = pygame.sprite.Group()
 	
@@ -440,6 +442,7 @@ def load_maze(game):
 	right_wall = None
 	top_wall = None
 	bottom_wall = None
+	store_wall = None
 	land = None
 	lava = None
 
@@ -463,8 +466,6 @@ def load_maze(game):
 	boss_one = None
 	boss_two = None
 	
-	end_point = None
-
 	with open (game, "r") as file:
 		maze_level = [line.strip() for line in file]
 
@@ -478,9 +479,9 @@ def load_maze(game):
 					wall = Wall(x,y)
 					all_sprites.add(wall)
 					wall_sprites.add(wall)
-				elif char == "S":
+				elif char == "P":
 					start_point = StartPoint (x,y)
-					player = Player (x,y)
+					player = Player(x,y)
 					all_sprites.add (start_point)
 					all_sprites.add(player)
 				elif char == "S":
@@ -503,6 +504,10 @@ def load_maze(game):
 					bottom_wall = BottomWall(x, y)
 					all_sprites.add(bottom_wall)
 					bottom_wall_sprites.add(bottom_wall)
+				elif char == "Z":
+					store_wall = StoreWall(x, y)
+					all_sprites.add(store_wall)
+					store_wall_sprites.add(store_wall)
 				elif char == "E":
 					land = Land(x, y)
 					all_sprites.add(land)
@@ -585,15 +590,14 @@ def load_maze(game):
 					boss_two = BossTwo(x, y)
 					all_sprites.add(boss_two)
 					boss_two_sprites.add(boss_two)
-					
-				#Endpoint
-				elif char == "E":
-					end_point = EndPoint (x,y)
-					all_sprites.add(end_point)
 
+	return all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, land, lava, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two
 
-
-	return all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, land, lava, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point
+#=======================================================================
+#     Here is the main function that has all the code to actually 
+#    use the sprites, display the graphics, and allow the player to 
+#                      actually play the game.
+#=======================================================================
 
 def main():
 	clock = pygame.time.Clock()
@@ -606,17 +610,18 @@ def main():
 	# Here are the collectables that allow the player to either advance 
 	# to the next level or attain items to advance to the next level
 	key = 0
-	sandDollars = 0
+#	sandDollars = 0
 
 	# These are the variables that will store the amount of each item
 	# 			 that the player has in their inventory
-	bones = 0
-	gasTank = 0
-	wetSuit = 0
-	finsV = 0
-	subHull = 0
-	propellerV = 0
-	radarV = 0
+
+#	bones = 0
+#	gasTank = 0
+#	wetSuit = 0
+#	finsV = 0
+#	subHull = 0
+#	propellerV = 0
+#	radarV = 0
 
 #=======================================================================
 #  Here is the player's inventory which contains all of the items that 
@@ -635,7 +640,12 @@ def main():
 	"Radar" : radarV
 	}
 	
-	all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point = load_maze("level" + zone + ".txt")
+#=======================================================================
+# Loading the first level of the game in and creating the display where 
+# 					the game will actually appear.
+#=======================================================================
+
+	all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two = load_maze("level" + zone + ".txt")
 	running = True
 	game_won = False
 
@@ -660,7 +670,7 @@ def main():
 					
 					#Setting the level to 2 and loading in the next level of the game
 					zone = "2"
-					all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point = load_maze("level" + zone + ".txt")
+					all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two = load_maze("level" + zone + ".txt")
 					
 					#Indicates the start of the next level
 					text = font.render("LEVEL 2", True, GOLD)
@@ -675,7 +685,7 @@ def main():
 					
 					#Setting the level to 3 and loading in the last level of the game
 					zone = "3"
-					all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point = load_maze("level" + zone + ".txt")
+					all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two = load_maze("level" + zone + ".txt")
 
 					#Indicates the start of the last level
 					text = font.render("LEVEL 3", True, GOLD)
@@ -686,14 +696,14 @@ def main():
 					screen.blit(text, text_rect)
 					
 #=======================================================================
-#				  Collecting Sand Dollars for Currency
+#			    Collecting Sand Dollars for Currency
 #=======================================================================
 
 			if pygame.sprite.collide_rect(player, sand_dollar_sprites, False):
 				sandDollars += 1
 				
 #=======================================================================
-#				   When the Player Runs into an NPC
+#				   Event: Player Runs into an NPC
 #=======================================================================
 			
 			if pygame.sprite.collide(player, helpful_npc_sprites, False):
@@ -703,6 +713,7 @@ def main():
 					background = text_rect.inflate(30, 20)
 					pygame.draw.rect(screen, BLACK, background)
 					screen.blit(text, text_rect)
+					
 #=======================================================================
 #				         Health and Lives System
 #=======================================================================
@@ -742,7 +753,19 @@ def main():
 				key += 1
 
 #=======================================================================
-#				        Winning the Game
+#				      Buying items from the Store
+#=======================================================================
+			if pygame.sprite.collide_rect(player, 
+
+#=======================================================================
+#				     Upgrading items in the Store
+#=======================================================================
+
+			if pygame.sprite.collide_rect(player, store_wall):
+				
+
+#=======================================================================
+#				         Winning the Game
 #=======================================================================
 
 		if health > 1 and lives > 0 and pygame.sprite.collide_rect(player, treasure):
@@ -780,6 +803,10 @@ def main():
 		 
 		pygame.display.flip()
 		clock.tick(FPS)
+
+#=======================================================================
+#				        Ends the Function
+#=======================================================================
 
 	pygame.quit()
 
