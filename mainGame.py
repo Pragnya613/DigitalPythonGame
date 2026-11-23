@@ -50,11 +50,11 @@ class Player(pygame.sprite.Sprite):
 		self.max_air_capacity = 100
 		self.move = True
 
-#=======================================================================
+#-----------------------------------------------------------------------
 #  Here is the player's inventory which contains all of the items that 
 # they'll use in the game. These items will be bought at the store using
 #        the sand dollars that they collect in level one.
-#=======================================================================
+#-----------------------------------------------------------------------
 		self.inventory = {
 			"Sand Dollar"
 			"Bones"
@@ -206,15 +206,6 @@ class Lava(pygame.sprite.Sprite):
         self.image.fill(GOLD)
         self.rect = self.image.get_rect(topleft = (x,y))
 
-
-
-
-
-
-
-
-
-
 #=======================================================================
 #                        SAND DOLLAR CLASS
 #=======================================================================
@@ -258,16 +249,7 @@ class Kelp(pygame.sprite.Sprite):
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(GREEN)
         self.rect = self.image.get_rect(topleft = (x,y))
-
-
-
-
-
-
-
-
-
-
+        
 #=======================================================================
 #                        HELPFUl NPC CLASS
 #=======================================================================
@@ -385,14 +367,6 @@ class Radar(pygame.sprite.Sprite):
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(BLUE)
         self.rect = self.image.get_rect(topleft = (x,y))
-
-
-
-
-
-
-
-
 
 #=======================================================================
 #                           SHARK CLASS
@@ -534,9 +508,9 @@ def load_maze(game):
 					all_sprites.add(wall)
 					wall_sprites.add(wall)
 				elif char == "P":
-					start_point = StartPoint (x,y)
+					start_point = StartPoint(x,y)
 					player = Player(x,y)
-					all_sprites.add (start_point)
+					all_sprites.add(start_point)
 					all_sprites.add(player)
 				elif char == "S":
 					rocks = Rocks(x, y)
@@ -646,6 +620,7 @@ def load_maze(game):
 					boss_two_sprites.add(boss_two)
 
 	return all_sprites, wall_sprites, player, rocks, left_wall, right_wall, top_wall, bottom_wall, store_wall, land, lava, sand_dollar, bone, coral, kelp, helpful_npc, treasure, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two
+	pass
 
 #=======================================================================
 #     Here is the main function that has all the code to actually 
@@ -654,6 +629,9 @@ def load_maze(game):
 #=======================================================================
 
 def main():
+	screen = pygame.display.set_mode((WIDTH, HEIGHT))
+	pygame.display.set_caption("Ocean Game")
+	
 	clock = pygame.time.Clock()
 	zone = "1"
 	
@@ -661,25 +639,17 @@ def main():
 	# to the next level or attain items to advance to the next level
 	key = 0
 
-#=======================================================================
+#-----------------------------------------------------------------------
 # Loading the first level of the game in and creating the display where 
 # 					the game will actually appear.
-#=======================================================================
+#-----------------------------------------------------------------------
 
 	all_sprites, wall_sprites, player, rocks, left_wall, right_wall, top_wall, bottom_wall, store_wall, land, lava, sand_dollar, bone, coral, kelp, helpful_npc, treasure, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two = load_maze("map" + zone + ".txt")
+	
 	running = True
 	game_won = False
 
-	screen = pygame.display.set_mode((WIDTH, HEIGHT))
-	pygame.display.set_caption("Ocean Game")
-
 	while running:
-		player.update(wall_sprites)		
-		player.update(left_wall_sprites)
-		player.update(right_wall_sprites)
-		player.update(top_wall_sprites)
-		player.update(bottom_wall_sprites)
-		player.update(rocks_sprites)
 		
 		for event in pygame.event.get():
 			
@@ -691,23 +661,22 @@ def main():
 					player.rect.topleft = start_point.rect.topleft
 					game_won = False
 				keys = pygame.key.get_pressed()
-
-		if player.move:
-			if keys[pygame.K_LEFT]:
-				player.rect.x -= 1
-			if keys[pygame.K_RIGHT]:
-				player.rect.x += 1
-			if keys[pygame.K_UP]:
-				player.rect.y -= 1
-			if keys[pygame.K_DOWN]:
-				player.rect.y += 1
+				if player.move:
+					if keys[pygame.K_LEFT]:
+						player.rect.x -= 1
+					if keys[pygame.K_RIGHT]:
+						player.rect.x += 1
+					if keys[pygame.K_UP]:
+						player.rect.y -= 1
+					if keys[pygame.K_DOWN]:
+						player.rect.y += 1
 
 #=======================================================================
 # 			This code below starts the dialogue for the npc
 #=======================================================================
 
-		if player.rect.colliderect(npc) and not dialog_active:
-			if keys[pygame.K_s]:
+		if pygame.sprite.spritecollide(player, helpful_npc, False) and not dialog_active:
+			if keys[pygame.K_d]:
 				dialog_active = True
 				player.move = False
 				dialog_index = 0
@@ -720,16 +689,16 @@ def main():
 			if dialog_index >= len(dialog_lines):
 				dialog_active = False
 				player.move = True
-				# Give item at end of dialog
+				# Give sand dollar to player at the end of the dialogue
 				player.add_item("Sand Dollar")
-				# Push player away
+				# Push the player away from the NPC
 				if player.rect.colliderect(npc):
-					player.rect.y = npc.top - player.rect.height - 10
+					player.rect.y = npc.top - player.rect.height - 15
 
 		# Toggle inventory with I
 		if keys[pygame.K_i]:
 			show_inventory = not show_inventory
-			pygame.time.wait(200)  # debounce
+			pygame.time.wait(200)
 
 		# Use item with number keys
 		for i in range(1, 10):
@@ -807,7 +776,6 @@ def main():
 					background = text_rect.inflate(30, 20)
 					pygame.draw.rect(screen, BLACK, background)
 					screen.blit(text, text_rect)
-					
 				elif (pygame.sprite.collide_rect(player, right_wall) or pygame.sprite.collide_rect(player, bottom_wall)) and zone == "10": 
 					screen.blit
 					zone = "11"
@@ -838,7 +806,6 @@ def main():
 					all_sprites, wall_sprites, player, rocks, left_wall, right_wall, top_wall, bottom_wall, store_wall, land, lava, sand_dollar, bone, coral, kelp, helpful_npc, treasure, key, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two = load_maze("level" + zone + ".txt")
 				elif (pygame.sprite.collide_rect(player, right_wall) or pygame.sprite.collide_rect(player, bottom_wall)) and zone == "17": 
 					screen.blit
-					
 				elif (pygame.sprite.collide_rect(player, right_wall) or pygame.sprite.collide_rect(player, bottom_wall)) and zone == "18":
 					screen.blit
 					
@@ -883,8 +850,7 @@ def main():
 				elif (pygame.sprite.collide_rect(player, right_wall) or pygame.sprite.collide_rect(player, bottom_wall)) and zone == "26":
 					screen.blit
 					game_won = True
-					
-					
+						
 #=======================================================================
 #			    Collecting Sand Dollars for Currency
 #=======================================================================
@@ -929,6 +895,10 @@ def main():
 						player.lives -= 1
 						print(player.lives)
 						player.health = 50
+				
+				if player.lives < 1:
+					game_won = False
+					
 					
 #=======================================================================
 #				         Collecting Keys
@@ -998,13 +968,11 @@ def main():
 			restart = input("Play Again?")
 			
 			if restart == "R" or restart == "r":
-				level = "1"
+				zone = "1"
 				keys = 0
 				all_sprites, wall_sprites, player, start_point, rocks, left_wall, right_wall, top_wall, bottom_wall, sand_dollar, bone, coral, kelp, helpful_npc, treasure, gas_tank, wetsuit, fins, sub_hull, propeller, radar, shark, squid, boss_one, boss_two, end_point = load_maze("maze" + level + ".txt")
 				game_won = False
 
-		#screen.blit(restart_text, restart_rect)
-		 
 		pygame.display.flip()
 		clock.tick(FPS)
 
